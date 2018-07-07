@@ -5,23 +5,32 @@
 #include "storage_mgr.h"
 
 /* manipulating page files */
+//***********************************YH***************************************
 void initStorageManager (void){}
 RC createPageFile (char *fileName){return 0;}
 RC openPageFile (char *fileName, SM_FileHandle *fHandle){return 0;}
 RC closePageFile (SM_FileHandle *fHandle){return 0;}
 RC destroyPageFile (char *fileName){return 0;}
+//****************************************************************************
 
 /* reading blocks from disc */
+//**********************************ZZ***************************************
 RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 int getBlockPos (SM_FileHandle *fHandle){return 0;}
 RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
+//****************************************************************************
+
+//************************************XM**************************************
 RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
+//*****************************************************************************
 
 /* writing blocks to a page file */
+//************************************YD***************************************
 RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 RC appendEmptyBlock (SM_FileHandle *fHandle){return 0;}
 RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle){return 0;}
+//*****************************************************************************
