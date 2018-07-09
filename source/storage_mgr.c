@@ -31,15 +31,19 @@ RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){return 0;}
 /* writing blocks to a page file */
 //************************************YD***************************************
 RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){
+    // check if mgmtInfo point to the correct file header
     if(fHandle->mgmtInfo == NULL) {
         printf("Write Error! File header not found!\n");
         return RC_FILE_HANDLE_NOT_INIT;
     }
+    // check if pageNum exists in the fHandle
     if(fHandle->totalNumPages < pageNum) {
         printf("Write Error! Page number not found!\n");
         return RC_WRITE_FAILED;
     }
+    // set the file header to the current block (pageNum)
     fseek(fHandle->mgmtInfo, pageNum * PAGE_SIZE, SEEK_SET);
+    // write page file (memPage) to current block
     if(fwrite(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
         printf("Write Error! Cannot write page to file!\n");
         return RC_WRITE_FAILED;
@@ -48,16 +52,21 @@ RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){
 }
 
 RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
+    // get current block position
     //int pos = getBlockPos(fHandle);
+    // check fHandle has correct file header
     if(fHandle->mgmtInfo == NULL) {
         printf("Write Error! File header not found!\n");
         return RC_FILE_HANDLE_NOT_INIT;
     }
+    // check current block position is valid
     if(fHandle->totalNumPages < fHandle->curPagePos) {
         printf("Write Error! Page number not found!\n");
         return RC_WRITE_FAILED;
     }
+    // set the file header to the current block 
     fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
+    // write page file (memPage) to current block
     if(fwrite(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
         printf("Write Error! Cannot write page to file!\n");
         return RC_WRITE_FAILED;
@@ -66,36 +75,44 @@ RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
 }
 
 RC appendEmptyBlock (SM_FileHandle *fHandle){
+    // check fHandle has correct file header
+    if(fHandle->mgmtInfo == NULL) {
+        printf("Appending Error! File header not found!\n");
+        return RC_FILE_HANDLE_NOT_INIT;
+    }
+    // Initialize a page handle, allocate PAGE_SIZE memory and fill it with '\0'
     SM_PageHandle emptyPh;
     if((emptyPh = (SM_PageHandle) malloc(PAGE_SIZE)) == NULL){
         printf("Appending Error! Cannot allocate memory for one page!\n");
         return RC_WRITE_FAILED;
     }
-    strcpy(emptyPh, "");
-    for(int i = 0; i < PAGE_SIZE; ++i){
-        strcat(emptyPh, "\0");
-    }
-    if(fHandle->mgmtInfo == NULL) {
-        printf("Appending Error! File header not found!\n");
-        return RC_FILE_HANDLE_NOT_INIT;
-    }
-    fseek(fHandle->mgmtInfo, fHandle->totalNumPages * PAGE_SIZE, SEEK_SET);
-    fprintf(fHandle->mgmtInfo, "%s", emptyPh);
+    memset(emptyPh, '\0', PAGE_SIZE);
+    // Reallocate (totalNumPages + 1) * PAGE_SIZE memory for mgmtInfo for the empty block
+    fHandle->mgmtInfo = (SM_PageHandle) realloc(fHandle->mgmtInfo, (fHandle->totalNumPages + 1) * PAGE_SIZE);
     fHandle->totalNumPages +=  1;
+    // set the file header to the start of the empty block
+    fseek(fHandle->mgmtInfo, (fHandle->totalNumPages-1) * PAGE_SIZE + 1, SEEK_SET);
+    // write the empty page to the file
+    fprintf(fHandle->mgmtInfo, "%s", emptyPh);
+    // free the memory of pageHandle
     free(emptyPh);
     return RC_OK;
 }
 
 RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle){
+    // check fHandle has correct file header
     if(fHandle->mgmtInfo == NULL){
         printf("Capacity Error! File header not found!\n");
         return RC_FILE_HANDLE_NOT_INIT;
     }
+    // check if the capacity of the file is big enough
     if(numberOfPages <= fHandle->totalNumPages){
         printf("Capacicty is enough.\n");
         return RC_OK;
     }
+    // calculate how many empty pages we need to append to the end of the file
     int numAppendingPage = numberOfPages - fHandle->totalNumPages;
+    // append numAppendingPage to the end of the file
     for(int i = 0; i < numAppendingPage; ++i){
         int RC_RETURNED = appendEmptyBlock(fHandle);
         if(RC_RETURNED == RC_OK) continue;
