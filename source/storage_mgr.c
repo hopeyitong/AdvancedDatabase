@@ -112,7 +112,7 @@ RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle){
     }
     // calculate how many empty pages we need to append to the end of the file
     int numAppendingPage = numberOfPages - fHandle->totalNumPages;
-    // append numAppendingPage to the end of the file
+    // append # of numAppendingPage empty pages to the end of the file
     for(int i = 0; i < numAppendingPage; ++i){
         int RC_RETURNED = appendEmptyBlock(fHandle);
         if(RC_RETURNED == RC_OK) continue;
