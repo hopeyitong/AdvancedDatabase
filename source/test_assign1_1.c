@@ -16,6 +16,7 @@ char *testName;
 /* prototypes for test functions */
 static void testCreateOpenClose(void);
 static void testSinglePageContent(void);
+static void testAllMethods(void);
 
 /* main function running all tests */
 int
@@ -27,6 +28,7 @@ main (void)
 
   testCreateOpenClose();
   testSinglePageContent();
+  testAllMethods();
 
   return 0;
 }
@@ -97,4 +99,35 @@ testSinglePageContent(void)
   TEST_CHECK(destroyPageFile (TESTPF));  
   
   TEST_DONE();
+}
+
+/* my test for testing every methods in storage_mgr.c */
+void
+testAllMethods(void){
+  SM_FileHandle fh;
+  SM_PageHandle ph;
+
+  testName = "test all methods in storage_mgr.c";
+  ph = (SM_PageHandle) malloc(PAGE_SIZE);
+
+  TEST_CHECK(createPageFile (TESTPF));
+  TEST_CHECK(openPageFile (TESTPF, &fh));
+  printf("created and opened file\n");
+
+  TEST_CHECK(appendEmptyBlock(&fh));
+  printf("append a new page to the file\n");
+
+  ph = "This is written to the current block.\n";
+  TEST_CHECK(writeCurrentBlock(&fh, ph));
+  printf("Written to current block!\n");
+
+  TEST_CHECK(appendEmptyBlock(&fh));
+  printf("append a new page to the file\n");
+
+  ph = "This is written to the 1st block.\n";
+  TEST_CHECK(writeBlock(1, &fh, ph));
+  printf("Written to the 1st block!\n");
+
+  TEST_CHECK(ensureCapacity(10, &fh));
+  printf("Ensure the capacity is 10\n");
 }
