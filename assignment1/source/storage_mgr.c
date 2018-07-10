@@ -91,89 +91,87 @@ RC destroyPageFile(char *fileName)
 
 /* reading blocks from disc */
 //**********************************ZZ***************************************
-//这个method里把大括号对齐一下，还有，凡是第一个if里面包含有return的，接下来可以不用else
-RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
+RC readBlock(int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-  // check if the file is opened or not
-  if (fHandle->mgmtInfo==NULL)
-  {
-    return RC_FILE_NOT_FOUND;
-  }
-  //check if the current page number exceed the total pages
-  if (fHandle->totalNumPages < fHandle->curPagePos) 
-  {
-        return RC_READ_NON_EXISTING_PAGE;
-  }
-    //set the pointer to the current page position
-    fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
-    //read page file to current block
-  if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1)
-  {
-      printf("Read ERROR,cannot read page to file");
-        return RC_READ_NON_EXISTING_PAGE;
-  }
-    return RC_OK;
+	// check if the file is opened or not
+	if (fHandle->mgmtInfo == NULL)
+	{
+		return RC_FILE_NOT_FOUND;
+	}
+	//check if the current page number exceed the total pages
+	if (fHandle->totalNumPages < fHandle->curPagePos)
+	{
+		return RC_READ_NON_EXISTING_PAGE;
+	}
+	//set the pointer to the current page position
+	fseek(fHandle->mgmtInfo, (fHandle->curPagePos - 1) * PAGE_SIZE, SEEK_SET);
+	//read page file to current block
+	if (fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1)
+	{
+		printf("Read ERROR,cannot read page to file");
+		return RC_READ_NON_EXISTING_PAGE;
+	}
+	return RC_OK;
 }
 
 
-int getBlockPos (SM_FileHandle *fHandle)
+int getBlockPos(SM_FileHandle *fHandle)
 {
-     if (fHandle->mgmtInfo==NULL)
-  {
-    return RC_FILE_NOT_FOUND;
-  }
-    return fHandle->curPagePos;
+	if (fHandle->mgmtInfo == NULL)
+	{
+		return RC_FILE_NOT_FOUND;
+	}
+	return fHandle->curPagePos;
 }
 
-RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
+RC readFirstBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-  return readBlock(0, fHandle, memPage);
+	return readBlock(0, fHandle, memPage);
 }
 
-RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
+RC readPreviousBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-  // check if the current page is the first page 
-  if (fHandle->curPagePos <= 0||fHandle->totalNumPages < fHandle->curPagePos ) 
-  {
-      return RC_READ_NON_EXISTING_PAGE;
-  }
-  return readBlock(fHandle->curPagePos - 1, fHandle, memPage);//这里的问题（也许？）是，读了前一个block，我觉得是不是该把curPagePos也往前移动一位
+	// check if the current page is the first page 
+	if (fHandle->curPagePos <= 0 || fHandle->totalNumPages < fHandle->curPagePos)
+	{
+		return RC_READ_NON_EXISTING_PAGE;
+	}
+	return readBlock(fHandle->curPagePos - 1, fHandle, memPage);
 }
-//所以我觉得可以写成 (fHandle->curPagePos--, ...)
 //****************************************************************************
 
 //************************************XM**************************************
-RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
+RC readCurrentBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-     if (fHandle->mgmtInfo==NULL)
-  {
-    return RC_FILE_NOT_FOUND;
-  }
-  //the currnt block postion should be start from current page
-      return readBlock(fHandle->curPagePos, fHandle, memPage);//
+	if (fHandle->mgmtInfo == NULL)
+	{
+		return RC_FILE_NOT_FOUND;
+	}
+	//the currnt block postion should be start from current page
+	return readBlock(fHandle->curPagePos, fHandle, memPage);//
 }
 
 
-RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
+RC readNextBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-  //if the NextBlock is beyond the last pagefile
-  //then it should return RC_READ_NON_EXISTING_PAGE
-  if (fHandle->curPagePos >= fHandle->totalNumPages - 1 )
-  {
-      return RC_READ_NON_EXISTING_PAGE;
-  }
-  else
-  {
-   //else, it should return the current page position +1
-      return readBlock(fHandle->curPagePos + 1, fHandle, memPage);
-  }
+	//if the NextBlock is beyond the last pagefile
+	//then it should return RC_READ_NON_EXISTING_PAGE
+	if (fHandle->curPagePos >= fHandle->totalNumPages - 1)
+	{
+		return RC_READ_NON_EXISTING_PAGE;
+	}
+	else
+	{
+		//else, it should return the current page position +1
+		return readBlock(fHandle->curPagePos + 1, fHandle, memPage);
+	}
 }
 
-RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
+RC readLastBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-  //the last page of blkock should be equals to the totalNumPages-1
-      return readBlock(fHandle->totalNumPages - 1, fHandle, memPage);
-  }
+	//the last page of blkock should be equals to the totalNumPages-1
+	return readBlock(fHandle->totalNumPages - 1, fHandle, memPage);
+}
 //*****************************************************************************
 
 /* writing blocks to a page file */
