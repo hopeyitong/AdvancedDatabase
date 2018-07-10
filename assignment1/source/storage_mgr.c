@@ -111,7 +111,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
   {
       printf("Read ERROR,cannot read page to file");
         return RC_READ_NON_EXISTING_PAGE;
-   }
+  }
     return RC_OK;
 }
 
