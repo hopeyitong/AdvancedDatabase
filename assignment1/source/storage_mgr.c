@@ -123,17 +123,20 @@ int getBlockPos (SM_FileHandle *fHandle)
   }
     return fHandle->curPagePos;
 }
+
 RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
   return readBlock(0, fHandle, memPage);
 }
+
 RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
   // check if the current page is the first page 
   if (fHandle->curPagePos <= 0||fHandle->totalNumPages < fHandle->curPagePos ) {
       return RC_READ_NON_EXISTING_PAGE;
   }
   return readBlock(fHandle->curPagePos - 1, fHandle, memPage);//这里的问题（也许？）是，读了前一个block，我觉得是不是该把curPagePos也往前移动一位
-}//所以我觉得可以写成 (fHandle->curPagePos--, ...)
+}
+//所以我觉得可以写成 (fHandle->curPagePos--, ...)
 //****************************************************************************
 
 //************************************XM**************************************
@@ -162,6 +165,7 @@ RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
       return readBlock(fHandle->curPagePos + 1, fHandle, memPage);
   }
 }
+
 RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
   //the last page of blkock should be equals to the totalNumPages-1
