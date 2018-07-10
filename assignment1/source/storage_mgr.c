@@ -143,12 +143,19 @@ RC readPreviousBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 //************************************XM**************************************
 RC readCurrentBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-	if (fHandle->mgmtInfo == NULL)
-	{
-		return RC_FILE_NOT_FOUND;
-	}
-	//the currnt block postion should be start from current page
-	return readBlock(fHandle->curPagePos, fHandle, memPage);//
+    //check if the file is open
+    if(fHandle->mgmtInfo == NULL) {
+        return RC_FILE_HANDLE_NOT_INIT;
+    }
+    if(fHandle->totalNumPages < fHandle->curPagePos) {
+        return RC_READ_NON_EXISTING_PAGE;
+    }
+    fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
+    if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
+        printf("Read ERROR,cannot read page to file");
+        returnRC_READ_NON_EXISTING_PAGE;
+    }
+    return RC_OK;
 }
 
 
