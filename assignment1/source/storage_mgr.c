@@ -106,11 +106,12 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
   }
     //set the pointer to the current page position
     fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
-    //
-    if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
+    //read page file to current block
+    if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1)
+  {
       printf("Read ERROR,cannot read page to file");
         return RC_READ_NON_EXISTING_PAGE;
-      }
+   }
     return RC_OK;
 }
 
@@ -138,7 +139,8 @@ RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
 //************************************XM**************************************
 RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-     if (fHandle->mgmtInfo==NULL){
+     if (fHandle->mgmtInfo==NULL)
+  {
     return RC_FILE_NOT_FOUND;
   }
   //the currnt block postion should be start from current page
