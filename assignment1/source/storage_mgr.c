@@ -131,7 +131,7 @@ RC readFirstBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 
 RC readPreviousBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
-	// check if the current page is the first page 
+	// check if the current page is the first page
 	if (fHandle->curPagePos <= 0 || fHandle->totalNumPages < fHandle->curPagePos)
 	{
 		return RC_READ_NON_EXISTING_PAGE;
@@ -153,7 +153,7 @@ RC readCurrentBlock(SM_FileHandle *fHandle, SM_PageHandle memPage)
     fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
     if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
         printf("Read ERROR,cannot read page to file");
-        returnRC_READ_NON_EXISTING_PAGE;
+        return RC_READ_NON_EXISTING_PAGE;
     }
     return RC_OK;
 }
@@ -256,4 +256,3 @@ RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle){
     }
     return RC_OK;
 }
-//*****************************************************************************
