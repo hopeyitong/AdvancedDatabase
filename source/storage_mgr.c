@@ -18,15 +18,15 @@ RC createPageFile(char *fileName)
 
     //check if the file exists
     if(fp == NULL){
-          return RC_FILE_NOT_FOUND;
+        return RC_FILE_NOT_FOUND;
     }
 
     //create a string with size of block_size and fill out the memory with 0s
-    SM_PageHandle str = (SM_PageHandle) malloc(PAGE_SIZE);
-    memset(str, '\0', PAGE_SIZE);
+    SM_PageHandle ph = (SM_PageHandle) malloc(PAGE_SIZE);
+    memset(ph, '\0', PAGE_SIZE);
    
     //assign the block to file 
-    long file_size=fwrite(str, sizeof(char), PAGE_SIZE, fp); 
+    long file_size=fwrite(ph, sizeof(char), PAGE_SIZE, fp); 
     
     //check if the file has enough space to write the page
     if (PAGE_SIZE != file_size) {
@@ -35,7 +35,7 @@ RC createPageFile(char *fileName)
     
     //close the file and free cache
     fclose(fp);	
-    free(str);  
+    free(ph);  
     
     return RC_OK;
 }
