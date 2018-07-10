@@ -95,13 +95,15 @@ RC destroyPageFile(char *fileName)
 RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
   // check if the file is opened or not
-  if (fHandle->mgmtInfo==NULL){
+  if (fHandle->mgmtInfo==NULL)
+  {
     return RC_FILE_NOT_FOUND;
   }
   //check if the current page number exceed the total pages
-  if (fHandle->totalNumPages < fHandle->curPagePos) {
+  if (fHandle->totalNumPages < fHandle->curPagePos) 
+  {
         return RC_READ_NON_EXISTING_PAGE;
-    }
+  }
     //set the pointer to the current page position
     fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
     //
