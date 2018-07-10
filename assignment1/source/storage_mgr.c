@@ -91,6 +91,7 @@ RC destroyPageFile(char *fileName)
 
 /* reading blocks from disc */
 //**********************************ZZ***************************************
+//这个method里把大括号对齐一下，还有，凡是第一个if里面包含有return的，接下来可以不用else
 RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
   // check if the file is opened or not
@@ -110,6 +111,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
     return RC_OK;
 }
 
+//这里需要考虑万一fHandle是NULL的情况，需要return handle not init
 int getBlockPos (SM_FileHandle *fHandle)
 {
     return fHandle->curPagePos;
@@ -120,18 +122,18 @@ RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
 }
 RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
   // check if the current page is the first page 
-  if (fHandle->curPagePos <= 0) {
+  if (fHandle->curPagePos <= 0) {//curPagePos会不会>=TotalPageNum呢？
       return RC_READ_NON_EXISTING_PAGE;
   }
-  return readBlock(fHandle->curPagePos - 1, fHandle, memPage);
-}
+  return readBlock(fHandle->curPagePos - 1, fHandle, memPage);//这里的问题（也许？）是，读了前一个block，我觉得是不是该把curPagePos也往前移动一位
+}//所以我觉得可以写成 (fHandle->curPagePos--, ...)
 //****************************************************************************
 
 //************************************XM**************************************
 RC readCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
   //the currnt block postion should be start from current page
-      return readBlock(fHandle->curPagePos, fHandle, memPage);
+      return readBlock(fHandle->curPagePos, fHandle, memPage);//虽然可能多余了一点，我觉得还是判断一下current block是不是valid吧
 }
 
 
@@ -143,7 +145,7 @@ RC readNextBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
   {
       return RC_READ_NON_EXISTING_PAGE;
   }
-  else{
+  else{//麻烦把下面这个注释对齐一下
     //else, it should return the current page position +1
       return readBlock(fHandle->curPagePos + 1, fHandle, memPage);
   }
@@ -152,7 +154,7 @@ RC readLastBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
 {
   //the last page of blkock should be equals to the totalNumPages-1
       return readBlock(fHandle->totalNumPages - 1, fHandle, memPage);
-    }
+    }//把这个括号对齐...
 //*****************************************************************************
 
 /* writing blocks to a page file */
