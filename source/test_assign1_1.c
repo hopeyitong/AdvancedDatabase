@@ -27,9 +27,9 @@ main (void)
   
   initStorageManager();
 
-  // testCreateOpenClose();
-  // testSinglePageContent();
-  // testWriteMethods();
+  testCreateOpenClose();
+  testSinglePageContent();
+  testWriteMethods();
   testReadMethods();
 
   return 0;
@@ -144,6 +144,9 @@ testWriteMethods(void){
   TEST_CHECK(closePageFile(&fh));
   fprintf(stdout, "page file has been closed\n");
 
+  // destroy new page file
+  TEST_CHECK(destroyPageFile (TESTPF));  
+
   free(ph);
   TEST_DONE();
 }
@@ -167,7 +170,7 @@ testReadMethods(void){
   for(int i = 0; i < numPages; ++i){
     memset(ph, i+'0', PAGE_SIZE);
     TEST_CHECK(writeBlock(i, &fh, ph));
-    fprintf(stdout, "Write block %d with all %d\n", i, i);
+    fprintf(stdout, "Write block No.%d with all %d\n", i, i);
   }
   
   SM_PageHandle tempPage = (SM_PageHandle) malloc(PAGE_SIZE);
@@ -197,6 +200,9 @@ testReadMethods(void){
 
   TEST_CHECK(closePageFile(&fh));
   fprintf(stdout, "page file has been closed\n");
+  
+  // destroy new page file
+  TEST_CHECK(destroyPageFile (TESTPF));  
 
   free(ph);
   free(tempPage);
