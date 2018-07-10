@@ -37,7 +37,7 @@ RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){
         return RC_FILE_HANDLE_NOT_INIT;
     }
     // check if pageNum exists in the fHandle
-    if(fHandle->totalNumPages < pageNum) {
+    if(fHandle->totalNumPages <= pageNum) {
         printf("Write Error! Page number not found!\n");
         return RC_WRITE_FAILED;
     }
@@ -60,12 +60,12 @@ RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
         return RC_FILE_HANDLE_NOT_INIT;
     }
     // check current block position is valid
-    if(fHandle->totalNumPages < fHandle->curPagePos) {
+    if(fHandle->totalNumPages <= fHandle->curPagePos) {
         printf("Write Error! Page number not found!\n");
         return RC_WRITE_FAILED;
     }
     // set the file header to the current block 
-    fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
+    fseek(fHandle->mgmtInfo, fHandle->curPagePos * PAGE_SIZE, SEEK_SET);
     // write page file (memPage) to current block
     if(fwrite(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
         printf("Write Error! Cannot write page to file!\n");
@@ -87,15 +87,15 @@ RC appendEmptyBlock (SM_FileHandle *fHandle){
         return RC_WRITE_FAILED;
     }
     memset(emptyPh, '\0', PAGE_SIZE);
-    // Reallocate (totalNumPages + 1) * PAGE_SIZE memory for mgmtInfo for the empty block
-    fHandle->mgmtInfo = (SM_PageHandle) realloc(fHandle->mgmtInfo, (fHandle->totalNumPages + 1) * PAGE_SIZE);
+
     fHandle->totalNumPages +=  1;
     // set the file header to the start of the empty block
-    fseek(fHandle->mgmtInfo, (fHandle->totalNumPages-1) * PAGE_SIZE + 1, SEEK_SET);
+    fseek(fHandle->mgmtInfo, 1, SEEK_END);
     // write the empty page to the file
     fprintf(fHandle->mgmtInfo, "%s", emptyPh);
     // free the memory of pageHandle
     free(emptyPh);
+    fHandle->curPagePos = fHandle->totalNumPages - 1;
     return RC_OK;
 }
 
