@@ -107,7 +107,7 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
     //set the pointer to the current page position
     fseek(fHandle->mgmtInfo, (fHandle->curPagePos-1) * PAGE_SIZE, SEEK_SET);
     //read page file to current block
-    if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1)
+  if(fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1)
   {
       printf("Read ERROR,cannot read page to file");
         return RC_READ_NON_EXISTING_PAGE;
@@ -118,7 +118,8 @@ RC readBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
 
 int getBlockPos (SM_FileHandle *fHandle)
 {
-     if (fHandle->mgmtInfo==NULL){
+     if (fHandle->mgmtInfo==NULL)
+  {
     return RC_FILE_NOT_FOUND;
   }
     return fHandle->curPagePos;
@@ -129,9 +130,11 @@ RC readFirstBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
   return readBlock(0, fHandle, memPage);
 }
 
-RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage){
+RC readPreviousBlock (SM_FileHandle *fHandle, SM_PageHandle memPage)
+{
   // check if the current page is the first page 
-  if (fHandle->curPagePos <= 0||fHandle->totalNumPages < fHandle->curPagePos ) {
+  if (fHandle->curPagePos <= 0||fHandle->totalNumPages < fHandle->curPagePos ) 
+  {
       return RC_READ_NON_EXISTING_PAGE;
   }
   return readBlock(fHandle->curPagePos - 1, fHandle, memPage);//这里的问题（也许？）是，读了前一个block，我觉得是不是该把curPagePos也往前移动一位
