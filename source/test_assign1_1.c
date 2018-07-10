@@ -142,5 +142,62 @@ testWriteMethods(void){
   TEST_CHECK(closePageFile(&fh));
   fprintf(stdout, "page file has been closed\n");
 
+  free(temp);
+  free(ph);
+  TEST_DONE();
+}
+
+void
+testReadMethods(void){
+  SM_FileHandle fh;
+  SM_PageHandle ph;
+  int numPages = 5;
+
+  testName = "test all methods in storage_mgr.c";
+  ph = (SM_PageHandle) malloc(PAGE_SIZE);
+
+  TEST_CHECK(createPageFile (TESTPF));
+  TEST_CHECK(openPageFile (TESTPF, &fh));
+  fprintf(stdout, "created and opened file\n");
+
+  TEST_CHECK(ensureCapacity(numPages, &fh));
+  fprintf(stdout, "Ensure the capacity is 10\n");
+
+  for(int i = 0; i < numPages; ++i){
+    memset(ph, i, PAGE_SIZE);
+    TEST_CHECK(writeBlock(i, &fh, ph));
+    fprintf(stdout, "Write block %d with all %d\n", i, i);
+  }
+  
+  SM_PageHandle tempPage = (SM_PageHandle) malloc(PAGE_SIZE);
+  for(int i = 0; i < numPages; ++i){
+    memset(tempPage, i, PAGE_SIZE);
+    TEST_CHECK(readBlock (i, &fh, ph));
+    ASSERT_EQUALS_STRING(ph, tempPage, "This page is read correctly!");
+  }
+  fprintf(stdout, "Read blocks correctly\n");
+
+  memset(tempPage, 0, PAGE_SIZE);
+  TEST_CHECK(readFirstBlock (&fh, ph));
+  ASSERT_EQUALS_STRING(ph, tempPage, "First page is read correctly!");
+
+  memset(tempPage, numPages - 1, PAGE_SIZE);
+  TEST_CHECK(readLastBlock (&fh, ph));
+  ASSERT_EQUALS_STRING(ph, tempPage, "Last page is read correctly!");
+
+  fh.curPagePos = 2;
+  memset(tempPage, 1, PAGE_SIZE);
+  TEST_CHECK(readPreviousBlock (&fh, ph));
+  ASSERT_EQUALS_STRING(ph, tempPage, "Previous page is read correctly!");
+
+  memset(tempPage, 3, PAGE_SIZE);
+  TEST_CHECK(readNextBlock (&fh, ph));
+  ASSERT_EQUALS_STRING(ph, tempPage, "Next page is read correctly!");
+
+  TEST_CHECK(closePageFile(&fh));
+  fprintf(stdout, "page file has been closed\n");
+
+  free(ph);
+  free(tempPage);
   TEST_DONE();
 }
