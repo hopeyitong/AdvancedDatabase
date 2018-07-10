@@ -97,12 +97,12 @@ RC readBlock(int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage)
 		return RC_FILE_NOT_FOUND;
 	}
 	//check if the current page number exceed the total pages
-	if (fHandle->totalNumPages < fHandle->curPagePos)
+	if (fHandle->totalNumPages <= pageNum)
 	{
 		return RC_READ_NON_EXISTING_PAGE;
 	}
 	//set the pointer to the current page position
-	fseek(fHandle->mgmtInfo, (fHandle->curPagePos - 1) * PAGE_SIZE, SEEK_SET);
+	fseek(fHandle->mgmtInfo, pageNum * PAGE_SIZE, SEEK_SET);
 	//read page file to current block
 	if (fread(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1)
 	{

@@ -17,6 +17,7 @@ char *testName;
 static void testCreateOpenClose(void);
 static void testSinglePageContent(void);
 static void testWriteMethods(void);
+static void testReadMethods(void);
 
 /* main function running all tests */
 int
@@ -28,7 +29,8 @@ main (void)
 
   // testCreateOpenClose();
   // testSinglePageContent();
-  testWriteMethods();
+  // testWriteMethods();
+  testReadMethods();
 
   return 0;
 }
@@ -142,7 +144,6 @@ testWriteMethods(void){
   TEST_CHECK(closePageFile(&fh));
   fprintf(stdout, "page file has been closed\n");
 
-  free(temp);
   free(ph);
   TEST_DONE();
 }
@@ -164,33 +165,33 @@ testReadMethods(void){
   fprintf(stdout, "Ensure the capacity is 10\n");
 
   for(int i = 0; i < numPages; ++i){
-    memset(ph, i, PAGE_SIZE);
+    memset(ph, i+'0', PAGE_SIZE);
     TEST_CHECK(writeBlock(i, &fh, ph));
     fprintf(stdout, "Write block %d with all %d\n", i, i);
   }
   
   SM_PageHandle tempPage = (SM_PageHandle) malloc(PAGE_SIZE);
   for(int i = 0; i < numPages; ++i){
-    memset(tempPage, i, PAGE_SIZE);
+    memset(tempPage, i + '0', PAGE_SIZE);
     TEST_CHECK(readBlock (i, &fh, ph));
     ASSERT_EQUALS_STRING(ph, tempPage, "This page is read correctly!");
   }
   fprintf(stdout, "Read blocks correctly\n");
 
-  memset(tempPage, 0, PAGE_SIZE);
+  memset(tempPage, '0', PAGE_SIZE);
   TEST_CHECK(readFirstBlock (&fh, ph));
   ASSERT_EQUALS_STRING(ph, tempPage, "First page is read correctly!");
 
-  memset(tempPage, numPages - 1, PAGE_SIZE);
+  memset(tempPage, (numPages - 1) + '0', PAGE_SIZE);
   TEST_CHECK(readLastBlock (&fh, ph));
   ASSERT_EQUALS_STRING(ph, tempPage, "Last page is read correctly!");
 
   fh.curPagePos = 2;
-  memset(tempPage, 1, PAGE_SIZE);
+  memset(tempPage, '1', PAGE_SIZE);
   TEST_CHECK(readPreviousBlock (&fh, ph));
   ASSERT_EQUALS_STRING(ph, tempPage, "Previous page is read correctly!");
 
-  memset(tempPage, 3, PAGE_SIZE);
+  memset(tempPage, '3', PAGE_SIZE);
   TEST_CHECK(readNextBlock (&fh, ph));
   ASSERT_EQUALS_STRING(ph, tempPage, "Next page is read correctly!");
 
