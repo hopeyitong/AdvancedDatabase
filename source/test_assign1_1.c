@@ -16,7 +16,7 @@ char *testName;
 /* prototypes for test functions */
 static void testCreateOpenClose(void);
 static void testSinglePageContent(void);
-static void testAllMethods(void);
+static void testWriteMethods(void);
 
 /* main function running all tests */
 int
@@ -28,7 +28,7 @@ main (void)
 
   testCreateOpenClose();
   testSinglePageContent();
-  testAllMethods();
+  testWriteMethods();
 
   return 0;
 }
@@ -103,7 +103,7 @@ testSinglePageContent(void)
 
 /* my test for testing every methods in storage_mgr.c */
 void
-testAllMethods(void){
+testWriteMethods(void){
   SM_FileHandle fh;
   SM_PageHandle ph;
 
@@ -112,22 +112,35 @@ testAllMethods(void){
 
   TEST_CHECK(createPageFile (TESTPF));
   TEST_CHECK(openPageFile (TESTPF, &fh));
-  printf("created and opened file\n");
+  fprintf(stdout, "created and opened file\n");
 
   TEST_CHECK(appendEmptyBlock(&fh));
-  printf("append a new page to the file\n");
+  fprintf(stdout, "append a new page to the file\n");
 
-  ph = "This is written to the current block.\n";
+  char * temp = "current ";
+  for(int i = 0,j = 0; i < PAGE_SIZE; ++i, ++j){
+    if(j >= sizeof(temp)) j = 0;
+    ph[i] = temp[j];
+  }
   TEST_CHECK(writeCurrentBlock(&fh, ph));
-  printf("Written to current block!\n");
+  fprintf(stdout, "Written to current block!\n");
 
   TEST_CHECK(appendEmptyBlock(&fh));
-  printf("append a new page to the file\n");
+  fprintf(stdout, "append a new page to the file\n");
 
-  ph = "This is written to the 1st block.\n";
-  TEST_CHECK(writeBlock(1, &fh, ph));
-  printf("Written to the 1st block!\n");
+  temp = "firstbl ";
+  for(int i = 0,j = 0; i < PAGE_SIZE; ++i, ++j){
+    if(j >= sizeof(temp)) j = 0;
+    ph[i] = temp[j];
+  }
+  TEST_CHECK(writeBlock(0, &fh, ph));
+  fprintf(stdout, "Written to the 1st block!\n");
 
   TEST_CHECK(ensureCapacity(10, &fh));
-  printf("Ensure the capacity is 10\n");
+  fprintf(stdout, "Ensure the capacity is 10\n");
+
+  TEST_CHECK(closePageFile(&fh));
+  fprintf(stdout, "page file has been closed\n");
+
+  TEST_DONE();
 }
