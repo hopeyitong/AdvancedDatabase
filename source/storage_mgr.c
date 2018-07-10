@@ -8,10 +8,81 @@
 /* manipulating page files */
 //***********************************YH***************************************
 void initStorageManager (void){}
-RC createPageFile (char *fileName){return 0;}
-RC openPageFile (char *fileName, SM_FileHandle *fHandle){return 0;}
-RC closePageFile (SM_FileHandle *fHandle){return 0;}
-RC destroyPageFile (char *fileName){return 0;}
+RC createPageFile(char *fileName)
+{
+    //open a file for writing and reading 
+    FILE *fp = fopen(fileName, "w+");
+
+    //disable the buffer so that following process are executed directly to disk
+    setbuf(fp, NULL);
+
+    //check if the file exists
+    if(fp == NULL){
+          return RC_FILE_NOT_FOUND;
+    }
+
+    //create a string with size of block_size and fill out the memory with 0s
+    SM_PageHandle str = (SM_PageHandle) malloc(PAGE_SIZE);
+    memset(str, '\0', PAGE_SIZE);
+   
+    //assign the block to file 
+    long file_size=fwrite(str, sizeof(char), PAGE_SIZE, fp); 
+    
+    //check if the file has enough space to write the page
+    if (PAGE_SIZE != file_size) {
+        return RC_WRITE_FAILED;
+    }
+    
+    //close the file and free cache
+    fclose(fp);	
+    free(str);  
+    
+    return RC_OK;
+}
+
+RC openPageFile(char *fileName, SM_FileHandle *fHandle)
+{
+    //open a file for reading and writing and check if file exists
+    FILE *fp = fopen(fileName, "r+");
+    if(fp == NULL){
+        return RC_FILE_NOT_FOUND;
+    }
+
+    //move pointer to end of the file
+    long reposit=fseek(fp, 0, SEEK_END);
+    if(reposit == -1){
+        return RC_READ_NON_EXISTING_PAGE;
+}
+    
+    //add 1 to the file size to make sure below total number of pages is correct
+    long fileSize = ftell(fp)+1;
+    
+    //assign fhandle variables
+    fHandle->fileName = fileName;
+    fHandle->totalNumPages = fileSize/PAGE_SIZE;
+    fHandle->curPagePos = 0;
+    fHandle->mgmtInfo = fp;
+    
+    return RC_OK;
+}
+
+RC closePageFile(SM_FileHandle *fHandle)
+{
+    //check if file exists, if yes close it
+    if(fclose(fHandle->mgmtInfo) == -1){
+        return RC_FILE_NOT_FOUND;
+    }
+    return RC_OK;
+}
+
+RC destroyPageFile(char *fileName)
+{
+    //check if file exists, if yes destroy it
+    if(remove(fileName) == -1) {
+        return RC_FILE_NOT_FOUND;
+    }
+    return RC_OK;
+}
 //****************************************************************************
 
 /* reading blocks from disc */
