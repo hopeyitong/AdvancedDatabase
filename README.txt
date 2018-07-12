@@ -19,9 +19,10 @@
                                      #####
 
 HOW TO RUN
-1. Go to the folder which contains source/ and Makefile
+1. Go to the folder which contains source/ README.txt and Makefile
 2. > make
 3. > ./build/assign1.out
+4. > make clean
 
 Methods Description In storage_mgr.c
 
@@ -78,3 +79,23 @@ Methods Description In storage_mgr.c
 /////////////////////////////
 /*    writing page files   */
 /////////////////////////////
+
+1. writeBlock
+1) check the file handle has been initialized 
+2) check the pageNum is valid
+3) set the file pointer to correct block and write PAGE_SIZE from memory to file
+
+2. writeCurrentBlock
+1）get current block position (current block) from file handle
+2) call writeBlock to write current block to file
+
+3. appendEmptyBlock
+1) check file Handle has correctly initialized
+2) initialize a page handle, allocate PAGE_SIZE memory and fill it with '\0'
+3) set the file header to the (end + 1) of the file handle pointer and write the page handle here
+
+4. ensureCapacity
+1) check the file handle has been initialized
+2) if the file handle has enough pages, return RC_OK
+  else compute how many pages we need to add to file handle
+3) call appendEmptyBlock to add the number of empty pages to file handle

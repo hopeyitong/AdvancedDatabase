@@ -197,25 +197,9 @@ RC writeBlock (int pageNum, SM_FileHandle *fHandle, SM_PageHandle memPage){
 
 RC writeCurrentBlock (SM_FileHandle *fHandle, SM_PageHandle memPage) {
     // get current block position
-    //int pos = getBlockPos(fHandle);
+    int pos = getBlockPos(fHandle);
     // check fHandle has correct file header
-    if(fHandle->mgmtInfo == NULL) {
-        printf("Write Error! File header not found!\n");
-        return RC_FILE_HANDLE_NOT_INIT;
-    }
-    // check current block position is valid
-    if(fHandle->totalNumPages <= fHandle->curPagePos) {
-        printf("Write Error! Page number not found!\n");
-        return RC_WRITE_FAILED;
-    }
-    // set the file header to the current block 
-    fseek(fHandle->mgmtInfo, fHandle->curPagePos * PAGE_SIZE, SEEK_SET);
-    // write page file (memPage) to current block
-    if(fwrite(memPage, PAGE_SIZE, 1, fHandle->mgmtInfo) != 1){
-        printf("Write Error! Cannot write page to file!\n");
-        return RC_WRITE_FAILED;
-    }
-    return RC_OK;
+    return writeBlock(pos, fHandle, memPage);
 }
 
 RC appendEmptyBlock (SM_FileHandle *fHandle){
