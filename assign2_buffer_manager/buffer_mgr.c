@@ -48,7 +48,7 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
 	 if (bm == NULL)
 	  return RC_BAD_PARAMETER;
     // check number pages
-  if (numPages == NULL)
+  if (numPages == 0)
    return RC_BAD_PARAMETER;
    //check file exist or not
    if( pageFileName == NULL)
