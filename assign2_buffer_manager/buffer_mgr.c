@@ -10,22 +10,23 @@ typedef struct BM_PageContent {
     int dirty;
     //initial count
     int fixCount;
+
+  }BM_PageContent;
+
+
+typedef struct BM_DataManager {
+    //record the order of writting into the buffer
+    BM_PageArray *pageHead;
+    BM_PageArray *pageTail;
     //initial total pages
     int totalPage;
     //initial read pages
     int totalRead;
     //initial write pages
     int totalWrite;
-  }BM_PageContent;
-
-
-typedef struct BM_DataManager {
-    //record the order of writting into the buffer
-    BM_PageArray *pageHeader;
-    BM_PageArray *pageTail;
     //page array
-    BM_PageHandle handleData[1000];
-    BM_PageContent  content[1000];
+    BM_PageHandle handleData[10000];
+    BM_PageContent  content[10000];
 
   }BM_DataManager;
 
@@ -57,16 +58,17 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
     //apply the space which has size 'numPages' to store page
 
     BM_DataManager *data = (BM_DataManager *)malloc(sizeof(BM_DataManager));
-    data->pageHeader = NULL;
+    data->pageHead = NULL;
     data->pageTail = NULL;
+    data->totalPage = 0;
+    data->totalRead = 0;
+    data->totalWrite = 0;
 
     for(int i = 0; i < numPages; i++)
     {
         (data->content[i]).dirty = 0;
         (data->content[i]).fixCount = 0;
-        (data->content[i]).totalPage = 0;
-        (data->content[i]).totalRead = 0;
-        (data->content[i]).totalWrite = 0;
+
     }
     bm->mgmtData = data;
     return RC_OK;
