@@ -5,6 +5,14 @@
 #include "storage_mgr.h"
 #include <stdio.h>
 
+typedef struct BM_PageArray {
+
+    int pageNumber;
+    int index;
+    struct BM_PageArray* next;
+
+  }BM_PageArray;
+
 typedef struct BM_PageContent {
    //check if dirty
     int dirty;
@@ -30,13 +38,7 @@ typedef struct BM_DataManager {
 
   }BM_DataManager;
 
-typedef struct BM_PageArray {
 
-    int pageNumber;
-    int index;
-    struct BM_PageArray* next;
-
-  }BM_PageArray;
 
 RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
                    const int numPages, ReplacementStrategy strategy,
@@ -50,10 +52,10 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
     return RC_BAD_PARAMETER;
 
    if( pageFileName == NULL)
-    return RC_BM_NON_EXISTING_PAGE
+    return RC_BM_NON_EXISTING_PAGE;
     //init bm pool
     bm->numPages = numPages;
-    bm->pageFile = (varchar*)pageFileName;
+    bm->pageFile = (char*)pageFileName;
     bm->strategy = strategy;
     //apply the space which has size 'numPages' to store page
 
