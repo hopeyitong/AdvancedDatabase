@@ -35,6 +35,7 @@ typedef struct BM_DataManager {
     //page array
     BM_PageHandle handleData[10000];
     BM_PageContent  content[10000];
+    BM_PageArray PageArray[10000];
 
   }BM_DataManager;
 
@@ -78,6 +79,39 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
 
 RC shutdownBufferPool(BM_BufferPool *const bm)
 {
+    int *res = (int *)malloc(bm->numPages * sizeof(PageNumber));
+    BM_DataManager *mydata = bm->mgmtData;
+
+    forceFlushPool(bm);
+
+    for(int i = 0; i < bm->numPages; i++) {
+        if(mydata->content[i].fixCount != 0) {
+            return RC_WRITE_FAILED;
+        }
+    }
+
+    free(mydata);
+
+
 
      return RC_OK;
+}
+RC forceFlushPool(BM_BufferPool *const bm) {
+  //
+    int *res = (int *)malloc(bm->numPages * sizeof(PageNumber));
+    BM_DataManager *mydata = bm->mgmtData;
+    for(int i = 0; i < mydata->totalPage; i++)
+  {
+      if(mydata->content[i].dirty == 1 && mydata->content[i].fixCount == 0){
+          SM_FileHandle fileHandle;
+        openPageFile(bm->pageFile, &fileHandle);
+
+        writeBlock(mydata->handleData[i].pageNum, &fileHandle,   mydata->handleData[i].data);
+        mydata->content[i].dirty = 0;
+        mydata->totalWrite++;
+
+      }
+
+  }
+  return RC_OK;
 }
