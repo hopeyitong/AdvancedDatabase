@@ -49,7 +49,7 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
 	 if (bm == NULL)
 	  return RC_BAD_PARAMETER;
     // check number pages
-  if (numPages == 0)
+   if (numPages == 0)
    return RC_BAD_PARAMETER;
    //check file exist or not
    if( pageFileName == NULL)
@@ -58,7 +58,7 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
     bm->numPages = numPages;
     bm->pageFile = (char*)pageFileName;
     bm->strategy = strategy;
-    //apply the space which has size 'numPages' to store page
+    //giving the space to size 'numPages' to store page
 
     BM_DataManager *data = (BM_DataManager *)malloc(sizeof(BM_DataManager));
     data->pageHead = NULL;
@@ -67,11 +67,10 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
     data->totalRead = 0;
     data->totalWrite = 0;
 
-    for(int i = 0; i < numPages; i++)
-    {
+    for(int i = 0; i < numPages; i++) {
+      
         (data->content[i]).dirty = 0;
         (data->content[i]).fixCount = 0;
-
     }
     bm->mgmtData = data;
     return RC_OK;
@@ -79,9 +78,10 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
 
 RC shutdownBufferPool(BM_BufferPool *const bm)
 {
+  // initial buffer pool
     int *res = (int *)malloc(bm->numPages * sizeof(PageNumber));
     BM_DataManager *mydata = bm->mgmtData;
-
+//write dirty pages to memory.
     forceFlushPool(bm);
 
     for(int i = 0; i < bm->numPages; i++) {
@@ -91,27 +91,28 @@ RC shutdownBufferPool(BM_BufferPool *const bm)
     }
 
     free(mydata);
-
-
-
-     return RC_OK;
+    return RC_OK;
 }
+
+
 RC forceFlushPool(BM_BufferPool *const bm) {
-  //
+  //initial buffer pool
     int *res = (int *)malloc(bm->numPages * sizeof(PageNumber));
     BM_DataManager *mydata = bm->mgmtData;
-    for(int i = 0; i < mydata->totalPage; i++)
-  {
-      if(mydata->content[i].dirty == 1 && mydata->content[i].fixCount == 0){
+    //write all dirty pages to memory blocks
+    for(int i = 0; i < mydata->totalPage; i++)  {
+    //check dirty or not and fixcount
+      if(mydata->content[i].dirty == 1 && mydata->content[i].fixCount == 0) {
           SM_FileHandle fileHandle;
+    //open pagefile
         openPageFile(bm->pageFile, &fileHandle);
-
+    //write blocks
         writeBlock(mydata->handleData[i].pageNum, &fileHandle,   mydata->handleData[i].data);
         mydata->content[i].dirty = 0;
         mydata->totalWrite++;
 
       }
 
-  }
+    }
   return RC_OK;
 }
