@@ -68,7 +68,7 @@ RC initBufferPool(BM_BufferPool *const bm, const char *const pageFileName,
     data->totalWrite = 0;
 
     for(int i = 0; i < numPages; i++) {
-      
+
         (data->content[i]).dirty = 0;
         (data->content[i]).fixCount = 0;
     }
@@ -109,7 +109,7 @@ RC forceFlushPool(BM_BufferPool *const bm) {
     //write blocks
         writeBlock(mydata->handleData[i].pageNum, &fileHandle,   mydata->handleData[i].data);
         mydata->content[i].dirty = 0;
-        mydata->totalWrite++;
+        
 
       }
 
