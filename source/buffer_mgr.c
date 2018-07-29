@@ -170,7 +170,9 @@ RC pinPage(BM_BufferPool *const bm, BM_PageHandle *const page,
         if (dm->handleData[i].pageNum == pageNum) //check if the requested page number is within the buffer pool already
             switch (bm->strategy)
             {
-
+            case RS_LFU:
+            case RS_CLOCK:
+            case RS_LRU_K:
             case RS_FIFO:
                 FIFO = 1;
                 dm->content[i].fixCount++;
