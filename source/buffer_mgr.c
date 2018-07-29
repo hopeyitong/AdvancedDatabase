@@ -313,5 +313,13 @@ int *getFixCounts(BM_BufferPool *const bm){
     }
     return fixConuts;
 }
-int getNumReadIO(BM_BufferPool *const bm);
-int getNumWriteIO(BM_BufferPool *const bm);
+int getNumReadIO(BM_BufferPool *const bm){
+    BM_DataManager* dm = bm->mgmtData;
+    int readIO = dm->totalRead;
+    return readIO;
+}
+int getNumWriteIO(BM_BufferPool *const bm){
+    BM_DataManager* dm = bm->mgmtData;
+    int writeIO = dm->totalWrite;
+    return writeIO;
+}
