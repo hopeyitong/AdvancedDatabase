@@ -290,7 +290,7 @@ PageNumber *getFrameContents(BM_BufferPool *const bm)
     fcontents = (PageNumber*) malloc(bm->numPages * sizeof(PageNumber));
     BM_DataManager* dm = bm->mgmtData;
     for(int i = 0; i < bm->numPages; ++i){
-        if(dm->handleData[i].data == NULL){
+        if(i >= dm->totalPage){
             fcontents[i] = NO_PAGE;
         }
         else fcontents[i] = dm->handleData[i].pageNum;
