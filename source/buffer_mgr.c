@@ -297,6 +297,8 @@ PageNumber *getFrameContents(BM_BufferPool *const bm)
     }
     return fcontents;
 }
+// The getDirtyFlags function returns an array of bools (of size numPages) where the ith element
+// is TRUE if the page stored in the ith page frame is dirty. Empty page frames are considered as clean.
 bool *getDirtyFlags(BM_BufferPool *const bm){
     bool* dirtys = (bool*) malloc(bm->numPages * sizeof(bool));
     BM_DataManager* dm = bm->mgmtData;
@@ -307,6 +309,8 @@ bool *getDirtyFlags(BM_BufferPool *const bm){
     }
     return dirtys;
 }
+// The getFixCounts function returns an array of ints (of size numPages) where the ith element
+// is the fix count of the page stored in the ith page frame. Return 0 for empty page frames.
 int *getFixCounts(BM_BufferPool *const bm){
     int* fixConuts = (int*) malloc(bm->numPages * sizeof(int));
     BM_DataManager* dm = bm->mgmtData;
@@ -315,11 +319,13 @@ int *getFixCounts(BM_BufferPool *const bm){
     }
     return fixConuts;
 }
+// The getNumReadIO function returns the number of pages that have been read from disk since a buffer pool has been initialized. 
 int getNumReadIO(BM_BufferPool *const bm){
     BM_DataManager* dm = bm->mgmtData;
     int readIO = dm->totalRead;
     return readIO;
 }
+// getNumWriteIO returns the number of pages written to the page file since the buffer pool has been initialized.
 int getNumWriteIO(BM_BufferPool *const bm){
     BM_DataManager* dm = bm->mgmtData;
     int writeIO = dm->totalWrite;
