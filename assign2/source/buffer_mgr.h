@@ -33,6 +33,43 @@ typedef struct BM_PageHandle {
 	char *data;
 } BM_PageHandle;
 
+typedef struct BM_PageArray
+{
+
+    int pageNumber;
+    int index;
+    struct BM_PageArray *next;
+
+} BM_PageArray;
+
+typedef struct BM_PageContent
+{
+    //check if dirty
+    int dirty;
+    //initial count
+    int fixCount;
+
+} BM_PageContent;
+
+//Define the structure of buffer manager
+typedef struct BM_DataManager
+{
+    //record the order of writting into the buffer
+    BM_PageArray *pageHeader;
+    BM_PageArray *pageTail;
+    //initial total pages
+    int totalPage;
+    //initial read pages
+    int totalRead;
+    //initial write pages
+    int totalWrite;
+    //page array
+    BM_PageHandle handleData[10000];
+    BM_PageContent content[10000];
+    BM_PageArray PageArray[10000];
+
+} BM_DataManager;
+
 // convenience macros
 #define MAKE_POOL()					\
 		((BM_BufferPool *) malloc (sizeof(BM_BufferPool)))

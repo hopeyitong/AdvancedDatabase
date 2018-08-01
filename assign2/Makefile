@@ -1,10 +1,10 @@
-TARGET_EXEC ?= assign1.out
+TARGET_EXEC ?= assign2.out
 
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./source
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+OBJS := $(SRCS:%=$(BUILD_DIR)/%.o) 
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
